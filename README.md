@@ -6,11 +6,14 @@ A slim wrapper around the google chrome file API.
 ## Install
 
 ```sh
-# Clone this repo into `node_modules`
-# require it
-var fs = require('file-system')(size)
-# ... should work, see https://github.com/substack/browserify-handbook#how-node_modules-works
+npm install https://github.com/peermusic/file-system
 ```
+
+```js
+var fs = require('file-system')(size)
+```
+
+For reference see the [Browserify Handbook](https://github.com/substack/browserify-handbook#how-node_modules-works).
 
 
 ## Demo
