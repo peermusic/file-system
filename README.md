@@ -15,6 +15,7 @@ var fs = require('file-system')(size)
 
 For reference see the [Browserify Handbook](https://github.com/substack/browserify-handbook#how-node_modules-works).
 
+**Note:** For running this demo *locally*, you need to start chrome with the `--allow-file-access-from-files` flag.
 
 ## Demo
 
