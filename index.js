@@ -12,9 +12,9 @@ function FileSystem (size) {
 
 // Get a file as a data url from the filesystem based on name
 FileSystem.prototype.get = function (file, callback) {
-  requestFilesystem(this.size, function (fs) {
-    fs.root.getFile(file, {}, function (fileEntry) {
-      fileEntry.file(function (file) {
+  requestFilesystem(this.size, function (file_system) {
+    file_system.root.getFile(file, {}, function (file_entry) {
+      file_entry.file(function (file) {
         var reader = new FileReader()
 
         reader.onloadend = function (e) {
