@@ -18,7 +18,7 @@ var fs = require('file-system')(size)
 ```sh
 npm install -g wzrd
 cd example
-wrd index.js:bundle.js
+wzrd index.js:bundle.js
 ```
 
 
