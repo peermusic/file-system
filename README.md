@@ -9,7 +9,7 @@ A slim wrapper around the google chrome file API.
 # Clone this repo into `node_modules`
 # require it
 var fs = require('file-system')(size)
-# ... should work
+# ... should work, see https://github.com/substack/browserify-handbook#how-node_modules-works
 ```
 
 
