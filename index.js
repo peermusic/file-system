@@ -12,9 +12,9 @@ function FileSystem (size) {
 
 // Get a file as a data url from the filesystem based on name
 FileSystem.prototype.get = function (file, callback) {
-  requestFilesystem(this.size, function (file_system) {
-    file_system.root.getFile(file, {}, function (file_entry) {
-      file_entry.file(function (file) {
+  requestFilesystem(this.size, function (fileSystem) {
+    fileSystem.root.getFile(file, {}, function (fileEntry) {
+      fileEntry.file(function (file) {
         var reader = new FileReader()
 
         reader.onloadend = function (e) {
@@ -29,9 +29,9 @@ FileSystem.prototype.get = function (file, callback) {
 
 // Add an array of files to the filesystem
 FileSystem.prototype.add = function (files, callback) {
-  requestFilesystem(this.size, function (file_system) {
+  requestFilesystem(this.size, function (fileSystem) {
     for (var i = 0; i !== files.length; i++) {
-      addFile(file_system, files[i])
+      addFile(fileSystem, files[i])
     }
 
     callback()
@@ -39,8 +39,8 @@ FileSystem.prototype.add = function (files, callback) {
 }
 
 // Add a single file to the file system
-var addFile = function (file_system, file) {
-  file_system.root.getFile(file.name, {create: true, exclusive: true}, function (entry) {
+var addFile = function (fileSystem, file) {
+  fileSystem.root.getFile(file.name, {create: true, exclusive: true}, function (entry) {
     entry.createWriter(function (writer) {
       writer.write(file)
     }, errorHandler)
@@ -49,13 +49,13 @@ var addFile = function (file_system, file) {
 
 // Get all files in the file system
 FileSystem.prototype.list = function (callback) {
-  requestFilesystem(this.size, function (file_system) {
-    var directory_reader = file_system.root.createReader()
+  requestFilesystem(this.size, function (fileSystem) {
+    var directoryReader = fileSystem.root.createReader()
     var entries = []
 
     // Call the reader.readEntries() until no more results are returned.
     var readEntries = function () {
-      directory_reader.readEntries(function (results) {
+      directoryReader.readEntries(function (results) {
         if (!results.length) {
           callback(entries.sort())
         } else {
@@ -72,8 +72,8 @@ FileSystem.prototype.list = function (callback) {
 
 // Delete a single file from the file system
 FileSystem.prototype.delete = function (file, callback) {
-  requestFilesystem(this.size, function (file_system) {
-    file_system.root.getFile(file, {}, function (entry) {
+  requestFilesystem(this.size, function (fileSystem) {
+    fileSystem.root.getFile(file, {}, function (entry) {
       entry.remove(function () {
         callback()
       }, errorHandler)
