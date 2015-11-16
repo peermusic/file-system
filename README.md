@@ -2,15 +2,29 @@
 
 A slim wrapper around the google chrome file API.
 
-## Compiling
 
-`browserify app.js -o bundle.js`
+## Install
+
+```sh
+# Clone this repo into `node_modules`
+# require it
+var fileSystem = require('file-system')(size)
+# ... should work
+```
+
+
+## Demo
+
+```sh
+npm install -g wzrd
+cd example
+wrd index.js:bundle.js
+```
+
 
 ## Usage
 
-You can see a usage demo in `app.js` and `demo.html`
-
-```javascript
+```js
 // Require the module with the desired size
 var FileSystem = require('./FileSystem.js')(size);
 

@@ -1,4 +1,4 @@
-var FileSystem = require('./FileSystem.js')(64 * 1024 * 1024);
+var FileSystem = require('../index.js')(64 * 1024 * 1024);
 
 // Get a file from the filesystem and display it's contents
 function getFile(file) {
