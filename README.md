@@ -1,4 +1,4 @@
-# FileSystem
+# file-system
 
 A slim wrapper around the google chrome file API.
 
@@ -8,7 +8,7 @@ A slim wrapper around the google chrome file API.
 ```sh
 # Clone this repo into `node_modules`
 # require it
-var fileSystem = require('file-system')(size)
+var fs = require('file-system')(size)
 # ... should work
 ```
 
@@ -26,20 +26,20 @@ wrd index.js:bundle.js
 
 ```js
 // Require the module with the desired size
-var FileSystem = require('./FileSystem.js')(size);
+var fs = require('file-system')(size);
 
 // Get a file as a data url from the filesystem based on name
-FileSystem.get(file, callback);
+fs.get(file, callback);
 
 // Add an array of files to the filesystem
-FileSystem.add(files, callback);
+fs.add(files, callback);
 
 // Get all files in the file system
-FileSystem.list(callback);
+fs.list(callback);
 
 // Delete a single file from the file system
-FileSystem.delete(file, callback);
+fs.delete(file, callback);
 
 // Clear all files from the file system
-FileSystem.clear(callback);
+fs.clear(callback);
 ```
