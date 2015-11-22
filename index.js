@@ -27,13 +27,22 @@ FileSystem.prototype.get = function (file, callback) {
   })
 }
 
+// Check if entry is a mp3 file
+FileSystem.prototype.check = function (file) {
+  if (file.type !== 'audio/mp3') {
+    console.log('This is not a mp3: ' + file.name)
+    return false
+  }
+  return true
+}
+
 // Add an array of files to the filesystem
 FileSystem.prototype.add = function (files, callback) {
   requestFilesystem(this.size, function (fileSystem) {
     for (var i = 0; i !== files.length; i++) {
+      if (FileSystem.prototype.check(files[i]) === false) continue
       addFile(fileSystem, files[i])
     }
-
     callback()
   })
 }
