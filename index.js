@@ -29,8 +29,8 @@ FileSystem.prototype.get = function (file, callback) {
 
 // Check if entry is a mp3 file
 FileSystem.prototype.check = function (file) {
-  if (file.type !== 'audio/mp3') {
-    console.log('This is not a mp3: ' + file.name)
+  if (file.type !== 'audio/mp3' && file.type !== 'audio/wav' && file.type !== 'audio/ogg') {
+    console.log('This is not a supported audio file: ' + file.name)
     return false
   }
   return true
