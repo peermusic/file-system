@@ -1,4 +1,4 @@
-var fs = require('../index.js')(64 * 1024 * 1024)
+var fs = require('../index.js')(64 * 1024 * 1024, ['audio/mp3', 'audio/wav', 'audio/ogg'])
 
 // Get a file from the filesystem and display it's contents
 function getFile (file) {
