@@ -1,13 +1,14 @@
 /* global FileReader, FileError */
 module.exports = FileSystem
 
-function FileSystem (size) {
+function FileSystem (size, types) {
   if (!(this instanceof FileSystem)) {
-    return new FileSystem()
+    return new FileSystem(size, types)
   }
 
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem
   this.size = size
+  this.types = types
 }
 
 // Get a file as a data url from the filesystem based on name
@@ -27,20 +28,23 @@ FileSystem.prototype.get = function (file, callback) {
   })
 }
 
-// Check if entry is a mp3 file
+// Check if entry is a supported file
 FileSystem.prototype.check = function (file) {
-  if (file.type !== 'audio/mp3' && file.type !== 'audio/wav' && file.type !== 'audio/ogg') {
-    console.log('This is not a supported audio file: ' + file.name)
-    return false
+  for (var i = 0; i !== this.types.length; i++){
+    if (file.type === this.types[i]) {
+      return true
+    }
   }
-  return true
+  console.log('This is not a supported audio file: ' + file.name)
+  return false
 }
 
 // Add an array of files to the filesystem
 FileSystem.prototype.add = function (files, callback) {
+  self = this
   requestFilesystem(this.size, function (fileSystem) {
     for (var i = 0; i !== files.length; i++) {
-      if (FileSystem.prototype.check(files[i]) === false) continue
+      if (self.check(files[i]) === false) continue
       addFile(fileSystem, files[i])
     }
     callback()
