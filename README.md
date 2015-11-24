@@ -28,8 +28,8 @@ wzrd index.js:bundle.js
 ## Usage
 
 ```js
-// Require the module with the desired size
-var fs = require('file-system')(size);
+// Require the module with the desired size and allowed file types
+var fs = require('file-system')(size, types);
 
 // Get a file as a data url from the filesystem based on name
 fs.get(file, callback);
