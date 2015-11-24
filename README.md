@@ -10,7 +10,7 @@ npm install https://github.com/peermusic/file-system
 ```
 
 ```js
-var fs = require('file-system')(size)
+var fs = require('file-system')(size, types)
 ```
 
 For reference see the [Browserify Handbook](https://github.com/substack/browserify-handbook#how-node_modules-works).
