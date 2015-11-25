@@ -30,7 +30,7 @@ FileSystem.prototype.get = function (file, callback) {
 
 // Check if entry is a supported file
 FileSystem.prototype.check = function (file) {
-  for (var i = 0; i !== this.types.length; i++){
+  for (var i = 0; i !== this.types.length; i++) {
     if (file.type === this.types[i]) {
       return true
     }
@@ -41,7 +41,7 @@ FileSystem.prototype.check = function (file) {
 
 // Add an array of files to the filesystem
 FileSystem.prototype.add = function (files, callback) {
-  self = this
+  var self = this
   requestFilesystem(this.size, function (fileSystem) {
     for (var i = 0; i !== files.length; i++) {
       if (self.check(files[i]) === false) continue
