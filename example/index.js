@@ -32,7 +32,7 @@ function showFiles () {
     for (var i in files) {
       var file = files[i]
       var li = document.createElement('li')
-      li.innerHTML = ['<a href="#" onclick="getFile(\'' + file.name + '\')">', file.name, '</a> &mdash <a href="#" onclick="deleteFile(\'' + file.name + '\')">delete</a>'].join('')
+      li.innerHTML = ['<a href="#" onclick="getFile(\'' + file.name + '\')">', file.name, '</a> &mdash; <a href="#" onclick="deleteFile(\'' + file.name + '\')">delete</a>'].join('')
       fragment.appendChild(li)
     }
 
