@@ -53,7 +53,7 @@ FileSystem.prototype.add = function (files, callback) {
 
 // Add a single file to the file system
 var addFile = function (fileSystem, file) {
-  fileSystem.root.getFile(file.name, {create: true, exclusive: true}, function (entry) {
+  fileSystem.root.getFile(file.hashName || file.name, {create: true, exclusive: true}, function (entry) {
     entry.createWriter(function (writer) {
       writer.write(file)
     }, errorHandler)
