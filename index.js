@@ -1,4 +1,6 @@
 /* global FileReader, FileError */
+var async = require('async')
+
 module.exports = FileSystem
 
 function FileSystem (size, types) {
@@ -8,61 +10,86 @@ function FileSystem (size, types) {
 
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem
   this.size = size
-  this.types = types
+  this.types = types || null
+}
+
+// Add a single file to the filesystem
+// If filename is not set, file.name will be used
+FileSystem.prototype.add = function (options, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  // No custom filename set, let's grab it from the file object
+  if (!options.filename) {
+    options.filename = options.file.name
+  }
+
+  // Check if the file passes the set types
+  if (this.types && !this.check(options.file)) {
+    callback('INVALID_FILE_TYPE')
+    return
+  }
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(options.filename, {create: true, exclusive: true}, function (entry) {
+      entry.createWriter(function (writer) {
+        // Setup our error and success handlers
+        writer.onerror = errorHandler
+        writer.onwriteend = function () {
+          callback(null)
+        }
+
+        // Write the file into the filesystem
+        writer.write(options.file)
+      }, errorHandler)
+    }, errorHandler)
+  }, errorHandler)
+}
+
+// Add multiple files to the filesystem
+FileSystem.prototype.addMultiple = function (array, callback) {
+  var self = this
+  async.map(array, function (file, callback) {
+    self.add(file, callback)
+  }, callback)
+}
+
+// Get the url to a file from the filesystem based on name
+FileSystem.prototype.get = function (filename, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(filename, {}, function (fileEntry) {
+      callback(null, fileEntry.toURL())
+    }, errorHandler)
+  }, errorHandler)
 }
 
 // Get a file as a data url from the filesystem based on name
-FileSystem.prototype.get = function (file, callback) {
-  requestFilesystem(this.size, function (fileSystem) {
-    fileSystem.root.getFile(file, {}, function (fileEntry) {
+FileSystem.prototype.getData = function (filename, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(filename, {}, function (fileEntry) {
       fileEntry.file(function (file) {
         var reader = new FileReader()
 
+        // Setup our error and success handlers
+        reader.onerror = errorHandler
         reader.onloadend = function (e) {
-          callback(this.result)
+          callback(null, this.result)
         }
 
         reader.readAsDataURL(file)
       }, errorHandler)
     }, errorHandler)
-  })
-}
-
-// Check if entry is a supported file
-FileSystem.prototype.check = function (file) {
-  for (var i = 0; i !== this.types.length; i++) {
-    if (file.type === this.types[i]) {
-      return true
-    }
-  }
-  console.log('This is not a supported audio file: ' + file.name)
-  return false
-}
-
-// Add an array of files to the filesystem
-FileSystem.prototype.add = function (files, callback) {
-  var self = this
-  requestFilesystem(this.size, function (fileSystem) {
-    for (var i = 0; i !== files.length; i++) {
-      if (self.check(files[i]) === false) continue
-      addFile(fileSystem, files[i])
-    }
-    callback()
-  })
-}
-
-// Add a single file to the file system
-var addFile = function (fileSystem, file) {
-  fileSystem.root.getFile(file.hashName || file.name, {create: true, exclusive: true}, function (entry) {
-    entry.createWriter(function (writer) {
-      writer.write(file)
-    }, errorHandler)
   }, errorHandler)
 }
 
-// Get all files in the file system
+// Get all files in the filesystem
 FileSystem.prototype.list = function (callback) {
-  requestFilesystem(this.size, function (fileSystem) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
     var directoryReader = fileSystem.root.createReader()
     var entries = []
 
@@ -70,9 +97,9 @@ FileSystem.prototype.list = function (callback) {
     var readEntries = function () {
       directoryReader.readEntries(function (results) {
         if (!results.length) {
-          callback(entries.sort())
+          callback(null, entries.sort())
         } else {
-          entries = entries.concat(toArray(results))
+          entries = entries.concat(Array.prototype.slice.call(results || [], 0))
           readEntries()
         }
       }, errorHandler)
@@ -80,61 +107,64 @@ FileSystem.prototype.list = function (callback) {
 
     // Start reading dirs.
     readEntries()
-  })
+  }, errorHandler)
 }
 
-// Delete a single file from the file system
-FileSystem.prototype.delete = function (file, callback) {
-  requestFilesystem(this.size, function (fileSystem) {
-    fileSystem.root.getFile(file, {}, function (entry) {
+// Delete a single file from the filesystem based on filename
+FileSystem.prototype.delete = function (filename, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(filename, {}, function (entry) {
       entry.remove(function () {
         callback()
       }, errorHandler)
     }, errorHandler)
-  })
+  }, errorHandler)
 }
 
-// Clear all files from the file system
+// Delete all files from the filesystem
 FileSystem.prototype.clear = function (callback) {
-  this.list(function (entries) {
-    entries.forEach(function (entry) {
-      entry.remove(function () {
-      }, errorHandler)
-    })
-    callback()
+  this.list(function (err, entries) {
+    if (err) callback(err)
+    async.map(entries, function (entry) {
+      entry.remove(
+        function () { callback(null) },
+        function (e) { callback(e) }
+      )
+    }, callback)
   })
 }
 
-// Make sure that we always get back an array
-function toArray (list) {
-  return Array.prototype.slice.call(list || [], 0)
+// Check if a file is passing the specified types
+FileSystem.prototype.check = function (file) {
+  return this.types.indexOf(file.type) !== -1
 }
 
-// Request a file system from the window object
-function requestFilesystem (size, callback) {
-  window.requestFileSystem(window.PERMANENT, size, callback, errorHandler)
+// Request a filesystem object from the window object
+FileSystem.prototype.requestFilesystem = function (callback, errorHandler) {
+  window.requestFileSystem(window.PERMANENT, this.size, callback, errorHandler)
+}
+
+// Create an error handler for a callback
+function createErrorHandler (callback) {
+  return function (e) { callback(getErrorString(e)) }
 }
 
 // Handle any file errors
-function errorHandler (e) {
+function getErrorString (e) {
   switch (e.code) {
     case FileError.QUOTA_EXCEEDED_ERR:
-      console.error('QUOTA_EXCEEDED_ERR')
-      break
+      return 'QUOTA_EXCEEDED_ERR'
     case FileError.NOT_FOUND_ERR:
-      console.error('NOT_FOUND_ERR')
-      break
+      return 'NOT_FOUND_ERR'
     case FileError.SECURITY_ERR:
-      console.error('SECURITY_ERR')
-      break
+      return 'SECURITY_ERR'
     case FileError.INVALID_MODIFICATION_ERR:
-      console.error('INVALID_MODIFICATION_ERR')
-      break
+      return 'INVALID_MODIFICATION_ERR'
     case FileError.INVALID_STATE_ERR:
-      console.error('INVALID_STATE_ERR')
-      break
+      return 'INVALID_STATE_ERR'
     default:
-      console.error('Unknown Error')
-      break
+      return 'Unknown Error'
   }
 }

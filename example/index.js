@@ -2,14 +2,22 @@ var fs = require('../index.js')(64 * 1024 * 1024, ['audio/mp3', 'audio/wav', 'au
 
 // Get a file from the filesystem and display it's contents
 function getFile (file) {
-  fs.get(file, function (content) {
-    window.open(content)
+  // OR: fs.getData to get a data url blob
+  fs.get(file, function (err, url) {
+    if (err) throw err
+    window.open(url)
   })
 }
 
 // Add a file to the filesystem
 function addFiles (files) {
-  fs.add(files, showFiles)
+  var fileArray = []
+
+  for (var i = 0; i !== files.length; i++) {
+    fileArray.push({file: files[i]})
+  }
+
+  fs.addMultiple(fileArray, showFiles)
 }
 
 // Delete a file from the filesystem
@@ -26,7 +34,8 @@ function clearFiles () {
 
 // Show all files of the filesystem
 function showFiles () {
-  fs.list(function (files) {
+  fs.list(function (err, files) {
+    if (err) throw err
     var fragment = document.createDocumentFragment()
 
     for (var i in files) {
@@ -56,7 +65,7 @@ function windowDrop (event) {
 
   // Check if the item is a folder
   if (files[0].type === '') {
-    console.error('Folder are not supported for drag \'n\' drop yet')
+    console.error('Folders are not supported, but need a custom helper like peermusic/subfolders-too')
     return
   }
 
