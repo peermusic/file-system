@@ -28,10 +28,9 @@ wzrd index.js:bundle.js
 ## Usage
 
 ```js
-// Require the module with the desired size and allowed file types
-var size = 64 * 1024 * 1024
+// Require the module with the (optional) allowed file types
 var types = ['audio/mp3', 'audio/wav', 'audio/ogg']
-var fs = require('file-system')(size, types)
+var fs = require('file-system')(types)
 
 // Callback is a Node.js-typical callback that takes an error as the first
 // parameter and a possible result as the second

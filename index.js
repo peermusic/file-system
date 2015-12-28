@@ -3,14 +3,13 @@ var async = require('async')
 
 module.exports = FileSystem
 
-function FileSystem (size, types) {
+function FileSystem (types) {
   if (!(this instanceof FileSystem)) {
-    return new FileSystem(size, types)
+    return new FileSystem(types)
   }
 
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem
-  this.size = size
-  this.types = types || null
+  this.types = types || []
 }
 
 // Add a single file to the filesystem
@@ -143,7 +142,24 @@ FileSystem.prototype.check = function (file) {
 
 // Request a filesystem object from the window object
 FileSystem.prototype.requestFilesystem = function (callback, errorHandler) {
-  window.requestFileSystem(window.PERMANENT, this.size, callback, errorHandler)
+  // Check if we are still within the quota
+  navigator.webkitPersistentStorage.queryUsageAndQuota(function (usedBytes, grantedBytes) {
+    var requestBytes = grantedBytes
+
+    // If we have 0 bytes granted, get at least 1GB to work with
+    if (grantedBytes === 0) {
+      requestBytes = 1000 * 1024 * 1024
+    }
+
+    // If we are going over half the limit, increase it so we can save things
+    if (usedBytes > grantedBytes * 0.5) {
+      requestBytes = Math.max(grantedBytes * 2, usedBytes * 2)
+    }
+
+    navigator.webkitPersistentStorage.requestQuota(requestBytes, function (grantedBytes) {
+      window.requestFileSystem(window.PERSISTENT, grantedBytes, callback, errorHandler)
+    }, errorHandler)
+  }, errorHandler)
 }
 
 // Create an error handler for a callback
