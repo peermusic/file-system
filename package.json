@@ -1,7 +1,7 @@
 {
   "name": "file-system",
-  "version": "0.1.1",
-  "description": "Wrapper for the FileSystem API",
+  "version": "0.1.2",
+  "description": "Wrapper for the Chrome FileSystem API",
   "main": "index.js",
   "scripts": {
     "test": "standard"
@@ -12,12 +12,16 @@
   },
   "keywords": [
     "fileSystem",
-    "wrapper"
+    "wrapper",
+    "Chrome"
   ],
   "author": "https://github.com/orgs/peermusic/",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/peermusic/file-system/issues"
   },
-  "homepage": "https://github.com/peermusic/file-system#readme"
+  "homepage": "https://github.com/peermusic/file-system#readme",
+  "dependencies": {
+    "async": "^1.5.0"
+  }
 }
