@@ -44,6 +44,15 @@ FileSystem.prototype.add = function (options, callback) {
   }, errorHandler)
 }
 
+// Add a single file to the filesystem
+// If filename is not set, file.name will be used
+FileSystem.prototype.addArrayBuffer = function (options, callback) {
+  if (!options.filename) throw new Error('filename property missing.')
+  options.file = new Blob([options.arrayBuffer], {type: 'audio/mp3'})
+  delete options.arrayBuffer
+  this.add(options, callback)
+}
+
 // Add multiple files to the filesystem
 FileSystem.prototype.addMultiple = function (array, callback) {
   var self = this
@@ -63,8 +72,30 @@ FileSystem.prototype.get = function (filename, callback) {
   }, errorHandler)
 }
 
+
+// Get a file as a array buffer from the filesystem based on name
+FileSystem.prototype.getArrayBuffer = function (filename, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(filename, {}, function (fileEntry) {
+      fileEntry.file(function (file) {
+        var reader = new FileReader()
+
+        // Setup our error and success handlers
+        reader.onerror = errorHandler
+        reader.onloadend = function (e) {
+          callback(null, this.result)
+        }
+
+        reader.readAsArrayBuffer(file)
+      }, errorHandler)
+    }, errorHandler)
+  }, errorHandler)
+}
+
 // Get a file as a data url from the filesystem based on name
-FileSystem.prototype.getData = function (filename, callback) {
+FileSystem.prototype.getDataUrl = function (filename, callback) {
   var errorHandler = createErrorHandler(callback)
 
   this.requestFilesystem(function (fileSystem) {
@@ -184,3 +215,4 @@ function getErrorString (e) {
       return 'Unknown Error'
   }
 }
+
