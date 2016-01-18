@@ -2,7 +2,7 @@ var fs = require('../index.js')(['audio/mp3', 'audio/wav', 'audio/ogg'])
 
 // Get a file from the filesystem and display it's contents
 function getFile (file) {
-  // OR: fs.getData to get a data url blob
+  // OR: fs.getDataUrl to get a data url blob
   fs.get(file, function (err, url) {
     if (err) throw err
     window.open(url)

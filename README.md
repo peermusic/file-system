@@ -43,6 +43,9 @@ var callback = function (err, result) {
 // If filename is not set, file.name will be used
 fs.add({filename: '...', file: File}, callback)
 
+// Add a single file to the filesystem using a array buffer
+fs.addArrayBuffer({filename: '...', arrayBuffer: ArrayBuffer)
+
 // Add multiple files to the filesystem
 fs.addMultiple([{filename: '...', file: File}, /* ... */], callback)
 
@@ -50,7 +53,10 @@ fs.addMultiple([{filename: '...', file: File}, /* ... */], callback)
 fs.get(filename, callback)
 
 // Get a file as a data url from the filesystem based on name
-fs.getData(filename, callback)
+fs.getDataUrl(filename, callback)
+
+// Get a file as a array buffer from the filesystem based on name
+fs.getArrayBuffer(filename, callback)
 
 // Get all files in the filesystem
 fs.list(callback)

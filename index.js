@@ -1,4 +1,4 @@
-/* global FileReader, FileError */
+/* global FileReader, FileError, Blob */
 var async = require('async')
 
 module.exports = FileSystem
@@ -44,8 +44,7 @@ FileSystem.prototype.add = function (options, callback) {
   }, errorHandler)
 }
 
-// Add a single file to the filesystem
-// If filename is not set, file.name will be used
+// Add a single file to the filesystem using a array buffer
 FileSystem.prototype.addArrayBuffer = function (options, callback) {
   if (!options.filename) throw new Error('filename property missing.')
   options.file = new Blob([options.arrayBuffer], {type: 'audio/mp3'})
@@ -71,7 +70,6 @@ FileSystem.prototype.get = function (filename, callback) {
     }, errorHandler)
   }, errorHandler)
 }
-
 
 // Get a file as a array buffer from the filesystem based on name
 FileSystem.prototype.getArrayBuffer = function (filename, callback) {
