@@ -52,6 +52,14 @@ FileSystem.prototype.addArrayBuffer = function (options, callback) {
   this.add(options, callback)
 }
 
+// Add a single file to the filesystem using a blob
+FileSystem.prototype.addBlob = function (options, callback) {
+  if (!options.filename) throw new Error('filename property missing.')
+  options.file = options.blob
+  delete options.arrayBuffer
+  this.add(options, callback)
+}
+
 // Add multiple files to the filesystem
 FileSystem.prototype.addMultiple = function (array, callback) {
   var self = this
@@ -213,4 +221,3 @@ function getErrorString (e) {
       return 'Unknown Error'
   }
 }
-
