@@ -1,4 +1,4 @@
-/* global FileReader, FileError, Blob */
+/* global FileReader, FileError, Blob, atob */
 var async = require('async')
 
 module.exports = FileSystem
@@ -49,6 +49,22 @@ FileSystem.prototype.addArrayBuffer = function (options, callback) {
   if (!options.filename) throw new Error('filename property missing.')
   options.file = new Blob([options.arrayBuffer], {type: 'audio/mp3'})
   delete options.arrayBuffer
+  this.add(options, callback)
+}
+
+// Add a single file to the filesystem using a dataUrl
+FileSystem.prototype.addDataUrl = function (options, callback) {
+  if (!options.filename) throw new Error('filename property missing.')
+  function dataURLtoBlob (dataUrl) {
+    var parts = dataUrl.split(',')
+    var mime = parts[0].match(/:(.*?);/)[1]
+    var binary = atob(parts[1])
+    var array = []
+    for (var i = 0; i < binary.length; i++) array.push(binary.charCodeAt(i))
+    return new Blob([new Uint8Array(array)], {type: mime})
+  }
+  options.file = dataURLtoBlob(options.dataUrl)
+  delete options.dataUrl
   this.add(options, callback)
 }
 
