@@ -95,6 +95,17 @@ FileSystem.prototype.get = function (filename, callback) {
   }, errorHandler)
 }
 
+// Get the a file from the filesystem based on name
+FileSystem.prototype.getFile = function (filename, callback) {
+  var errorHandler = createErrorHandler(callback)
+
+  this.requestFilesystem(function (fileSystem) {
+    fileSystem.root.getFile(filename, {}, function (fileEntry) {
+      callback(null, fileEntry)
+    }, errorHandler)
+  }, errorHandler)
+}
+
 // Get a file as a array buffer from the filesystem based on name
 FileSystem.prototype.getArrayBuffer = function (filename, callback) {
   var errorHandler = createErrorHandler(callback)
